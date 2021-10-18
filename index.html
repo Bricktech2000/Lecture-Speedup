@@ -11,76 +11,95 @@
     <div class="playbackRate">&nbsp;</div>
     <div class="videoDuration">&nbsp;</div>
     <script>
+      //copy to zoom recording
+      const zoom = () => {
+        window.video = document.getElementsByTagName('video')[0];
+        window.playbackRate = document.createElement('div');
+        document.body.appendChild(playbackRate);
+        playbackRate.style.color = 'red';
+        playbackRate.style.position = 'absolute';
+        playbackRate.style.left = '0';
+        playbackRate.style.top = '0';
+        window.videoDuration = document.createElement('div');
+        document.body.appendChild(videoDuration);
+        videoDuration.style.color = 'red';
+        videoDuration.style.position = 'absolute';
+        videoDuration.style.left = '10em';
+        videoDuration.style.top = '0';
+      };
+
+      //local code
       const fileInput = document.querySelector('.fileInput');
       const playbackRate = document.querySelector('.playbackRate');
       const videoDuration = document.querySelector('.videoDuration');
+      const video = document.createElement('video');
 
       // https://stackoverflow.com/questions/30424121/get-blob-image-from-file-input-using-jquery/30424172
       fileInput.onchange = (e) => {
         const file = e.target.files[0];
+        const source = document.createElement('source');
         e.target.files = null;
         const reader = new FileReader();
-        const video = document.createElement('video');
-        const source = document.createElement('source');
         // video.controls = true;
         // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
         source.src = URL.createObjectURL(file);
         video.appendChild(source);
         document.body.appendChild(video);
         console.log(file);
-
-        const updatePlaybackRate = (rateMultiplier) => {
-          const newRate = video.playbackRate * rateMultiplier;
-          video.playbackRate = Math.min(Math.max(newRate, 1 / 16), 16);
-          playbackRate.textContent =
-            'Playback Rate: ' + video.playbackRate.toFixed(2) + 'x';
-        };
-        updatePlaybackRate(1);
-
-        window.addEventListener('keydown', (e) => {
-          switch (e.code) {
-            case 'ShiftRight':
-              if (video.paused || video.ended) video.play();
-              else video.pause();
-              break;
-            case 'ArrowUp':
-              e.preventDefault();
-              updatePlaybackRate(1.25);
-              break;
-            case 'ArrowDown':
-              e.preventDefault();
-              updatePlaybackRate(1 / 1.25);
-              break;
-            case 'ArrowLeft':
-              e.preventDefault();
-              // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-              console.log(video.currentTime);
-              video.currentTime = video.currentTime - 5;
-              break;
-          }
-        });
-        const mul = 4;
-        window.addEventListener('keydown', (e) => {
-          // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
-          if (e.repeat) return;
-          if (e.code == 'ArrowRight') {
-            e.preventDefault();
-            updatePlaybackRate(mul);
-          }
-        });
-        window.addEventListener('keyup', (e) => {
-          if (e.code == 'ArrowRight') {
-            e.preventDefault();
-            updatePlaybackRate(1 / mul);
-          }
-        });
-        setInterval(() => {
-          videoDuration.textContent =
-            'Progress: ' +
-            ((video.currentTime / video.duration) * 100).toFixed(0) +
-            '%';
-        }, 100);
       };
+
+      //copy to zoom recording or webpage
+      const updatePlaybackRate = (rateMultiplier) => {
+        const newRate = video.playbackRate * rateMultiplier;
+        video.playbackRate = Math.min(Math.max(newRate, 1 / 16), 16);
+        playbackRate.textContent =
+          'Playback Rate: ' + video.playbackRate.toFixed(2) + 'x';
+      };
+      updatePlaybackRate(1);
+
+      window.addEventListener('keydown', (e) => {
+        switch (e.code) {
+          case 'ShiftRight':
+            if (video.paused || video.ended) video.play();
+            else video.pause();
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            updatePlaybackRate(1.25);
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            updatePlaybackRate(1 / 1.25);
+            break;
+          case 'ArrowLeft':
+            e.preventDefault();
+            // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
+            console.log(video.currentTime);
+            video.currentTime = video.currentTime - 5;
+            break;
+        }
+      });
+      const mul = 4;
+      window.addEventListener('keydown', (e) => {
+        // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
+        if (e.repeat) return;
+        if (e.code == 'ArrowRight') {
+          e.preventDefault();
+          updatePlaybackRate(mul);
+        }
+      });
+      window.addEventListener('keyup', (e) => {
+        if (e.code == 'ArrowRight') {
+          e.preventDefault();
+          updatePlaybackRate(1 / mul);
+        }
+      });
+      setInterval(() => {
+        videoDuration.textContent =
+          'Progress: ' +
+          ((video.currentTime / video.duration) * 100).toFixed(0) +
+          '%';
+      }, 100);
     </script>
   </body>
 </html>
