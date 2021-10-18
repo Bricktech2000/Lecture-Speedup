@@ -1,0 +1,4 @@
+- up arrow: `speed \* 1.25`
+- down arrow: `speed / 1.25`
+- left arrow: `back 5 seconds`
+- right arrow: `temporarily speed \* 2`
