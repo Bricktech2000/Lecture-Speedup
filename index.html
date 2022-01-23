@@ -49,51 +49,81 @@
       };
 
       //copy to zoom recording or webpage
+      const multiplier = Math.pow(2, 1 / 3);
+      const maxPow = 12;
+      const mulPow = 6;
+
       const updatePlaybackRate = (rateMultiplier) => {
         const newRate = video.playbackRate * rateMultiplier;
-        video.playbackRate = Math.min(Math.max(newRate, 1 / 16), 16);
+        video.playbackRate = Math.min(
+          Math.max(newRate, Math.pow(multiplier, -maxPow) + 0.000000001),
+          Math.pow(multiplier, maxPow) - 0.000000001
+        );
         playbackRate.textContent =
           'Playback Rate: ' + video.playbackRate.toFixed(2) + 'x';
       };
       updatePlaybackRate(1);
+      const killEvent = (e) => {
+        // https://stackoverflow.com/questions/19469881/remove-all-event-listeners-of-specific-type
+        // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      };
 
-      window.addEventListener('keydown', (e) => {
-        switch (e.code) {
-          case 'ShiftRight':
-            if (video.paused || video.ended) video.play();
-            else video.pause();
-            break;
-          case 'ArrowUp':
-            e.preventDefault();
-            updatePlaybackRate(1.25);
-            break;
-          case 'ArrowDown':
-            e.preventDefault();
-            updatePlaybackRate(1 / 1.25);
-            break;
-          case 'ArrowLeft':
-            e.preventDefault();
-            // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-            console.log(video.currentTime);
-            video.currentTime = video.currentTime - 5;
-            break;
-        }
-      });
-      const mul = 4;
-      window.addEventListener('keydown', (e) => {
-        // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
-        if (e.repeat) return;
-        if (e.code == 'ArrowRight') {
-          e.preventDefault();
-          updatePlaybackRate(mul);
-        }
-      });
-      window.addEventListener('keyup', (e) => {
-        if (e.code == 'ArrowRight') {
-          e.preventDefault();
-          updatePlaybackRate(1 / mul);
-        }
-      });
+      window.addEventListener(
+        'keydown',
+        (e) => {
+          switch (e.code) {
+            case 'ShiftRight':
+              if (video.paused || video.ended) video.play();
+              else video.pause();
+              killEvent(e);
+              break;
+            case 'ArrowUp':
+              e.preventDefault();
+              updatePlaybackRate(Math.pow(multiplier, 1));
+              killEvent(e);
+              break;
+            case 'ArrowDown':
+              e.preventDefault();
+              updatePlaybackRate(Math.pow(multiplier, -1));
+              killEvent(e);
+              break;
+            case 'ArrowLeft':
+              e.preventDefault();
+              // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
+              video.currentTime = video.currentTime - 5;
+              killEvent(e);
+              break;
+          }
+        },
+        true
+      );
+
+      window.addEventListener(
+        'keydown',
+        (e) => {
+          if (e.code == 'ArrowRight') {
+            // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
+            killEvent(e);
+            if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
+          }
+        },
+        true
+      );
+
+      window.addEventListener(
+        'keyup',
+        (e) => {
+          if (e.code == 'ArrowRight') {
+            killEvent(e);
+            if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
+          }
+        },
+        true
+      );
+
       setInterval(() => {
         videoDuration.textContent =
           'Progress: ' +
