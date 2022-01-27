@@ -101,7 +101,14 @@
       };
 
       const consoleRun = () => {
-        window.video = document.getElementsByTagName('video')[0];
+        window.video =
+          document.getElementsByTagName('video')[0] ||
+          document
+            .querySelector('d2l-labs-media-player')
+            .shadowRoot.querySelector('video');
+        if (window.video === undefined)
+          console.error('Error: could not find video element.');
+
         window.playbackRate = document.createElement('div');
         document.body.appendChild(playbackRate);
         playbackRate.style.color = '#fff';
