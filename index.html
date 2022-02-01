@@ -17,6 +17,7 @@
       const multiplier = Math.pow(2, 1 / 3); // 3 divisions to double playback rate
       const maxPow = 12; // multiplier ^ maxPow = 16 (max playback rate for most browsers)
       const mulPow = 6; // multiplier ^ mulPow = 4 (multiply playback rate by 4 when pressing right arrow key)
+      const backwardsJump = 5; // the number of seconds to jump back when the left arrow is pressed
 
       const updatePlaybackRate = (rateMultiplier) => {
         const newRate = video.playbackRate * rateMultiplier;
@@ -60,7 +61,7 @@
               case 'ArrowLeft':
                 e.preventDefault();
                 // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-                video.currentTime = video.currentTime - 5;
+                video.currentTime = video.currentTime - backwardsJump;
                 killEvent(e);
                 break;
             }
