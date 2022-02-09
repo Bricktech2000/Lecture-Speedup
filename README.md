@@ -11,6 +11,8 @@ Lecture Speedup is a quick script I wrote to allow me to blaze through recorded 
 - Left Arrow: `progress -= 5 seconds`
 - Right Arrow: `speed *= 4` while it is held down
 
+Moreover, it displays the current playback speed and progress percentage in the top left corner of the screen.
+
 ## Usage
 
 To use the script with a local video file, run `index.html` in any web browser.
