@@ -15,4 +15,4 @@ Lecture Speedup is a quick script I wrote to allow me to blaze through recorded 
 
 To use the script with a local video file, run `index.html` in any web browser.
 
-To use the script on a webpage (YouTube, Zoom, or other), copy the contents of the first `script` tag in `index.html` into the console of the webpage and run `consoleRun();` to execute the script.
+To use the script on a webpage (YouTube, Zoom, Dropbox or other), copy the contents of the first `script` tag in `index.html` into the console of the webpage and run `consoleRun()` to execute the script.
