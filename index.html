@@ -102,11 +102,18 @@
 
       const consoleRun = () => {
         window.video =
-          document.getElementsByTagName('video')[0] ||
-          document
-            .querySelector('d2l-labs-media-player')
-            .shadowRoot.querySelector('video');
-        if (window.video === undefined)
+          document.querySelector('video') ||
+          [...document.querySelectorAll('iframe')].reduce((acc, el) => {
+            try {
+              return (
+                acc || el.contentWindow.document.querySelector('video') || acc
+              );
+            } catch (e) {
+              return acc;
+            }
+          }, false);
+
+        if (window.video === false)
           console.error('Error: could not find video element.');
 
         window.playbackRate = document.createElement('div');

@@ -18,4 +18,12 @@ The script also displays the current playback speed and progress percentage in t
 
 To use the script with a local video file, run `index.html` in any web browser.
 
-To use the script on a webpage (YouTube, Zoom, Dropbox or other), copy the contents of the first `script` tag in `index.html` into the console of the webpage and run `consoleRun()` to initialize the script.
+To use the script on a webpage, copy the contents of the first `script` tag in `index.html` into the console of the webpage and run `consoleRun()` to initialize the script.
+
+## Supported Services
+
+- YouTube
+- Dropbox
+- Zoom Recordings
+- Google Drive (by changing JavaScript context)
+- Local Video Files
