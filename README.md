@@ -4,7 +4,7 @@ For the people who can't stand wasting valuable time
 
 ## Overview
 
-Lecture Speedup is a quick script I wrote to allow me to blaze through recorded lectures in university. It implements the following key bindings:
+Lecture Speedup is a simple browser extension I wrote to allow me to blaze through recorded lectures in university. It implements the following key bindings:
 
 - Right Shift: play / pause
 - Up Arrow: `speed *= cbrt(2)`
@@ -12,13 +12,23 @@ Lecture Speedup is a quick script I wrote to allow me to blaze through recorded 
 - Left Arrow: `progress -= 5 seconds`
 - Right Arrow: `speed *= 4` while it is held down
 
-The script also displays the current playback speed and progress percentage in the top left corner of the screen.
+The extension also displays the current playback speed and progress percentage in the top left corner of the page.
+
+## Requirements
+
+- Any Chromium-based browser
+
+## Installation
+
+1. Clone the repository
+2. Navigate to _chrome://extensions_
+3. Click the "Load unpacked extension..." button
+4. Select the downloaded folder
+5. Click the "Load" button
 
 ## Usage
 
-To use the script with a local video file, run `index.html` in any web browser.
-
-To use the script on a webpage, copy the contents of the first `script` tag in `index.html` into the console of the webpage and run `consoleRun()` to initialize the script.
+To use the extension, navigate to a page containing an HTML `video` element and make sure the extension is enabled. Then, press the right Shift key three times to activate the extension in the current page. Once activated, the current playback speed and progress percentage will be displayed in the top left corner of the page.
 
 ## Supported Services
 
@@ -26,4 +36,3 @@ To use the script on a webpage, copy the contents of the first `script` tag in `
 - Dropbox
 - Zoom Recordings
 - Google Drive (by changing JavaScript context)
-- Local Video Files
