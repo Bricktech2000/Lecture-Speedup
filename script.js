@@ -23,71 +23,48 @@ const killEvent = (e) => {
   e.stopImmediatePropagation();
 };
 
-const initBindings = () => {
-  updatePlaybackRate(1);
-
-  window.addEventListener(
-    'keydown',
-    (e) => {
-      switch (e.code) {
-        case 'ShiftRight':
-          if (video.paused || video.ended) video.play();
-          else video.pause();
-          killEvent(e);
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          updatePlaybackRate(Math.pow(multiplier, 1));
-          killEvent(e);
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          updatePlaybackRate(Math.pow(multiplier, -1));
-          killEvent(e);
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-          video.currentTime = video.currentTime - backwardsJump;
-          killEvent(e);
-          break;
-      }
-    },
-    true
-  );
-
-  window.addEventListener(
-    'keydown',
-    (e) => {
-      if (e.code == 'ArrowRight') {
-        // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
-        killEvent(e);
-        if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
-      }
-    },
-    true
-  );
-
-  window.addEventListener(
-    'keyup',
-    (e) => {
-      if (e.code == 'ArrowRight') {
-        killEvent(e);
-        if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
-      }
-    },
-    true
-  );
-
-  setInterval(() => {
-    videoDuration.textContent =
-      'Progress: ' +
-      ((video.currentTime / video.duration) * 100).toFixed(0) +
-      '%';
-  }, 100);
+const keyDownListener = (e) => {
+  switch (e.code) {
+    case 'ShiftRight':
+      if (video.paused || video.ended) video.play();
+      else video.pause();
+      killEvent(e);
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      updatePlaybackRate(Math.pow(multiplier, 1));
+      killEvent(e);
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      updatePlaybackRate(Math.pow(multiplier, -1));
+      killEvent(e);
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
+      video.currentTime = video.currentTime - backwardsJump;
+      killEvent(e);
+      break;
+  }
 };
 
-const consoleRun = () => {
+const arrowRightKeyDownListener = (e) => {
+  if (e.code == 'ArrowRight') {
+    // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
+    killEvent(e);
+    if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
+  }
+};
+
+const arrowRightKeyUpListener = (e) => {
+  if (e.code == 'ArrowRight') {
+    killEvent(e);
+    if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
+  }
+};
+
+const consoleStart = () => {
   window.video =
     document.querySelector('video') ||
     [...document.querySelectorAll('iframe')].reduce((acc, el) => {
@@ -121,15 +98,39 @@ const consoleRun = () => {
   videoDuration.style.zIndex = '1000000';
   videoDuration.style.fontSize = '20px';
 
-  initBindings();
+  updatePlaybackRate(1);
+
+  window.addEventListener('keydown', keyDownListener, true);
+  window.addEventListener('keydown', arrowRightKeyDownListener, true);
+  window.addEventListener('keyup', arrowRightKeyUpListener, true);
+
+  setInterval(() => {
+    videoDuration.textContent =
+      'Progress: ' +
+      ((video.currentTime / video.duration) * 100).toFixed(0) +
+      '%';
+  }, 100);
 };
 
-document.addEventListener('load', consoleRun);
+const consoleEnd = () => {
+  document.body.removeChild(window.playbackRate);
+  document.body.removeChild(window.videoDuration);
+
+  window.removeEventListener('keydown', keyDownListener, true);
+  window.removeEventListener('keydown', arrowRightKeyDownListener, true);
+  window.removeEventListener('keyup', arrowRightKeyUpListener, true);
+};
 
 var counter = 0;
+var running = false;
 document.addEventListener('keydown', (e) => {
-  if (e.code == 'ShiftRight') counter++;
+  if (e.code == 'ControlRight') counter++;
   else counter = 0;
 
-  if (counter == 3) consoleRun();
+  if (counter == 3) {
+    if (!running) consoleStart();
+    else consoleEnd();
+    running = !running;
+    counter = 0;
+  }
 });
