@@ -28,7 +28,7 @@ The extension also displays the current playback speed and progress percentage i
 
 ## Usage
 
-To use the extension, navigate to a page containing an HTML `video` element and make sure the extension is enabled. Then, press the right Control key three times to activate the extension in the current page. Once activated, the current playback speed and progress percentage will be displayed in the top left corner of the page. Press the right Control key again to deactivate the extension.
+To use the extension, navigate to a page containing an HTML `video` element and make sure the extension is enabled. Then, press the right (or left) Control key three times to activate the extension in the current page. Once activated, the current playback speed and progress percentage will be displayed in the top left corner of the page. Press the right (or left) Control key again to deactivate the extension.
 
 ## Supported Services
 

@@ -124,7 +124,7 @@ const consoleEnd = () => {
 var counter = 0;
 var running = false;
 document.addEventListener('keydown', (e) => {
-  if (e.code == 'ControlRight') counter++;
+  if (e.code == 'ControlRight' || e.code == 'ControlLeft') counter++;
   else counter = 0;
 
   if (counter == 3) {
