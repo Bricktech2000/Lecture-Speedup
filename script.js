@@ -4,17 +4,42 @@
 const multiplier = Math.pow(2, 1 / 3); // 3 divisions to double playback rate
 const maxPow = 12; // multiplier ^ maxPow = 16 (max playback rate for most browsers)
 const mulPow = 6; // multiplier ^ mulPow = 4 (multiply playback rate by 4 when pressing right arrow key)
-const backwardsJump = 5; // the number of seconds to jump back when the left arrow is pressed
+const jumpTime = 5; // the number of seconds to jump backwards or forwards when the video is paused
 
+var playbackInterval = null;
+var playbackRate = 1;
 const updatePlaybackRate = (rateMultiplier) => {
-  const newRate = video.playbackRate * rateMultiplier;
-  video.playbackRate = Math.min(
-    Math.max(newRate, Math.pow(multiplier, -maxPow) + 0.000000001),
-    Math.pow(multiplier, maxPow) - 0.000000001
-  );
-  playbackRate.textContent =
-    'Playback Rate: ' + video.playbackRate.toFixed(2) + 'x';
+  playbackRate = playbackRate * rateMultiplier;
+
+  // hacky code to get negative playback rate
+
+  playbackRate =
+    Math.min(
+      Math.max(
+        Math.abs(playbackRate),
+        Math.pow(multiplier, -maxPow) + 0.000000001
+      ),
+      Math.pow(multiplier, maxPow) - 0.000000001
+    ) * Math.sign(playbackRate);
+
+  if (playbackInterval) {
+    clearInterval(playbackInterval);
+    video.play();
+  }
+
+  if (playbackRate < 0) {
+    video.pause();
+    playbackInterval = setInterval(() => {
+      video.currentTime += playbackRate / 10;
+    }, 1000 / 10);
+  }
+
+  video.playbackRate = Math.abs(playbackRate);
+
+  playbackRateDiv.textContent =
+    'Playback Rate: ' + playbackRate.toFixed(2) + 'x';
 };
+
 const killEvent = (e) => {
   // https://stackoverflow.com/questions/19469881/remove-all-event-listeners-of-specific-type
   // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
@@ -31,36 +56,42 @@ const keyDownListener = (e) => {
       killEvent(e);
       break;
     case 'ArrowUp':
-      e.preventDefault();
       updatePlaybackRate(Math.pow(multiplier, 1));
       killEvent(e);
       break;
     case 'ArrowDown':
-      e.preventDefault();
       updatePlaybackRate(Math.pow(multiplier, -1));
       killEvent(e);
       break;
     case 'ArrowLeft':
-      e.preventDefault();
       // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-      video.currentTime = video.currentTime - backwardsJump;
+      if (video.paused && playbackRate > 0) video.currentTime -= jumpTime;
+      else if (!e.repeat) updatePlaybackRate(-Math.pow(multiplier, mulPow));
+      killEvent(e);
+      break;
+    case 'ArrowRight':
+      // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
+      if (video.paused && playbackRate > 0) video.currentTime += jumpTime;
+      else if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
       killEvent(e);
       break;
   }
 };
 
-const arrowRightKeyDownListener = (e) => {
-  if (e.code == 'ArrowRight') {
-    // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
-    killEvent(e);
-    if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
-  }
-};
-
-const arrowRightKeyUpListener = (e) => {
-  if (e.code == 'ArrowRight') {
-    killEvent(e);
-    if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
+const keyUpListener = (e) => {
+  switch (e.code) {
+    case 'ArrowLeft':
+      // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
+      if (video.paused && playbackRate > 0) null;
+      else if (!e.repeat) updatePlaybackRate(-Math.pow(multiplier, -mulPow));
+      killEvent(e);
+      break;
+    case 'ArrowRight':
+      // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
+      if (video.paused && playbackRate > 0) null;
+      else if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
+      killEvent(e);
+      break;
   }
 };
 
@@ -78,34 +109,34 @@ const consoleStart = () => {
   if (window.video === false)
     console.error('Error: could not find video element.');
 
-  window.playbackRate = document.createElement('div');
-  document.body.appendChild(playbackRate);
-  playbackRate.style.color = '#fff';
-  playbackRate.style.textShadow = '0 0 16px #000, 0 0 16px #000, 0 0 16px #000';
-  playbackRate.style.position = 'absolute';
-  playbackRate.style.left = '10px';
-  playbackRate.style.top = '10px';
-  playbackRate.style.zIndex = '1000000';
-  playbackRate.style.fontSize = '20px';
-  window.videoDuration = document.createElement('div');
-  document.body.appendChild(videoDuration);
-  videoDuration.style.color = '#fff';
-  videoDuration.style.textShadow =
+  window.playbackRateDiv = document.createElement('div');
+  document.body.appendChild(playbackRateDiv);
+  playbackRateDiv.style.color = '#fff';
+  playbackRateDiv.style.textShadow =
     '0 0 16px #000, 0 0 16px #000, 0 0 16px #000';
-  videoDuration.style.position = 'absolute';
-  videoDuration.style.left = 'calc(10px + 10em)';
-  videoDuration.style.top = '10px';
-  videoDuration.style.zIndex = '1000000';
-  videoDuration.style.fontSize = '20px';
+  playbackRateDiv.style.position = 'absolute';
+  playbackRateDiv.style.left = '10px';
+  playbackRateDiv.style.top = '10px';
+  playbackRateDiv.style.zIndex = '1000000';
+  playbackRateDiv.style.fontSize = '20px';
+  window.videoDurationDiv = document.createElement('div');
+  document.body.appendChild(videoDurationDiv);
+  videoDurationDiv.style.color = '#fff';
+  videoDurationDiv.style.textShadow =
+    '0 0 16px #000, 0 0 16px #000, 0 0 16px #000';
+  videoDurationDiv.style.position = 'absolute';
+  videoDurationDiv.style.left = 'calc(10px + 10em)';
+  videoDurationDiv.style.top = '10px';
+  videoDurationDiv.style.zIndex = '1000000';
+  videoDurationDiv.style.fontSize = '20px';
 
   updatePlaybackRate(1);
 
   window.addEventListener('keydown', keyDownListener, true);
-  window.addEventListener('keydown', arrowRightKeyDownListener, true);
-  window.addEventListener('keyup', arrowRightKeyUpListener, true);
+  window.addEventListener('keyup', keyUpListener, true);
 
   setInterval(() => {
-    videoDuration.textContent =
+    videoDurationDiv.textContent =
       'Progress: ' +
       ((video.currentTime / video.duration) * 100).toFixed(0) +
       '%';
@@ -113,12 +144,11 @@ const consoleStart = () => {
 };
 
 const consoleEnd = () => {
-  document.body.removeChild(window.playbackRate);
-  document.body.removeChild(window.videoDuration);
+  document.body.removeChild(window.playbackRateDiv);
+  document.body.removeChild(window.videoDurationDiv);
 
   window.removeEventListener('keydown', keyDownListener, true);
-  window.removeEventListener('keydown', arrowRightKeyDownListener, true);
-  window.removeEventListener('keyup', arrowRightKeyUpListener, true);
+  window.removeEventListener('keyup', keyUpListener, true);
 };
 
 var counter = 0;

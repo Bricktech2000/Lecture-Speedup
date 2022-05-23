@@ -9,8 +9,10 @@ Lecture Speedup is a simple browser extension I wrote to allow me to blaze throu
 - Right Shift: play / pause
 - Up Arrow: `speed *= cbrt(2)`
 - Down Arrow: `speed /= cbrt(2)`
-- Left Arrow: `progress -= 5 seconds`
-- Right Arrow: `speed *= 4` while it is held down
+- Left Arrow while playing: `speed *= -4`
+- Left Arrow while paused: `progress += -5 seconds`
+- Right Arrow while playing: `speed *= 4`
+- Right Arrow while paused: `progress += 5 seconds`
 
 The extension also displays the current playback speed and progress percentage in the top left corner of the page.
 
