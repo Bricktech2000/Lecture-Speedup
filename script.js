@@ -36,8 +36,7 @@ const updatePlaybackRate = (rateMultiplier) => {
 
   video.playbackRate = Math.abs(playbackRate);
 
-  playbackRateDiv.textContent =
-    'Playback Rate: ' + playbackRate.toFixed(2) + 'x';
+  playbackRateDiv.textContent = `${playbackRate.toFixed(2)}`;
 };
 
 const killEvent = (e) => {
@@ -119,33 +118,16 @@ const consoleStart = () => {
   playbackRateDiv.style.top = '10px';
   playbackRateDiv.style.zIndex = '1000000';
   playbackRateDiv.style.fontSize = '20px';
-  window.videoDurationDiv = document.createElement('div');
-  document.body.appendChild(videoDurationDiv);
-  videoDurationDiv.style.color = '#fff';
-  videoDurationDiv.style.textShadow =
-    '0 0 16px #000, 0 0 16px #000, 0 0 16px #000';
-  videoDurationDiv.style.position = 'absolute';
-  videoDurationDiv.style.left = 'calc(10px + 10em)';
-  videoDurationDiv.style.top = '10px';
-  videoDurationDiv.style.zIndex = '1000000';
-  videoDurationDiv.style.fontSize = '20px';
+  playbackRateDiv.style.fontFamily = 'monospace';
 
   updatePlaybackRate(1);
 
   window.addEventListener('keydown', keyDownListener, true);
   window.addEventListener('keyup', keyUpListener, true);
-
-  setInterval(() => {
-    videoDurationDiv.textContent =
-      'Progress: ' +
-      ((video.currentTime / video.duration) * 100).toFixed(0) +
-      '%';
-  }, 100);
 };
 
 const consoleEnd = () => {
   document.body.removeChild(window.playbackRateDiv);
-  document.body.removeChild(window.videoDurationDiv);
 
   window.removeEventListener('keydown', keyDownListener, true);
   window.removeEventListener('keyup', keyUpListener, true);
