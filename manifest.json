@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Lecture Speedup",
   "description": "Lecture Speedup",
   "version": "1.0",
@@ -10,5 +10,6 @@
       "js": ["script.js"],
       "run_at": "document_end"
     }
-  ]
+  ],
+  "content_security_policy": {}
 }
