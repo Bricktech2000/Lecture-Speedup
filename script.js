@@ -1,11 +1,12 @@
 // copy to console of YouTube, Zoom, Dropbox or other
-// "*yit I love Vim bindings
 
 const multiplier = Math.pow(2, 1 / 3); // 3 divisions to double playback rate
 const maxPow = 12; // multiplier ^ maxPow = 16 (max playback rate for most browsers)
 const mulPow = 6; // multiplier ^ mulPow = 4 (multiply playback rate by 4 when pressing right arrow key)
 const jumpTime = 5; // the number of seconds to jump backwards or forwards when the video is paused
 
+var video = null;
+var playbackRateDiv = null;
 var playbackInterval = null;
 var playbackRate = 1;
 const updatePlaybackRate = (rateMultiplier) => {
@@ -13,13 +14,11 @@ const updatePlaybackRate = (rateMultiplier) => {
 
   // hacky code to get negative playback rate
 
+  const small = 0.000000001;
   playbackRate =
     Math.min(
-      Math.max(
-        Math.abs(playbackRate),
-        Math.pow(multiplier, -maxPow) + 0.000000001
-      ),
-      Math.pow(multiplier, maxPow) - 0.000000001
+      Math.max(Math.abs(playbackRate), Math.pow(multiplier, -maxPow) + small),
+      Math.pow(multiplier, maxPow) - small
     ) * Math.sign(playbackRate);
 
   if (playbackInterval) {
@@ -54,6 +53,12 @@ const keyDownListener = (e) => {
       else video.pause();
       killEvent(e);
       break;
+    case 'ControlRight':
+      // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
+      // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
+      if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
+      killEvent(e);
+      break;
     case 'ArrowUp':
       updatePlaybackRate(Math.pow(multiplier, 1));
       killEvent(e);
@@ -63,15 +68,11 @@ const keyDownListener = (e) => {
       killEvent(e);
       break;
     case 'ArrowLeft':
-      // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-      if (video.paused && playbackRate > 0) video.currentTime -= jumpTime;
-      else if (!e.repeat) updatePlaybackRate(-Math.pow(multiplier, mulPow));
+      video.currentTime -= jumpTime;
       killEvent(e);
       break;
     case 'ArrowRight':
-      // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
-      if (video.paused && playbackRate > 0) video.currentTime += jumpTime;
-      else if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
+      video.currentTime += jumpTime;
       killEvent(e);
       break;
   }
@@ -79,23 +80,15 @@ const keyDownListener = (e) => {
 
 const keyUpListener = (e) => {
   switch (e.code) {
-    case 'ArrowLeft':
-      // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
-      if (video.paused && playbackRate > 0) null;
-      else if (!e.repeat) updatePlaybackRate(-Math.pow(multiplier, -mulPow));
-      killEvent(e);
-      break;
-    case 'ArrowRight':
-      // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
-      if (video.paused && playbackRate > 0) null;
-      else if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
+    case 'ControlRight':
+      if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
       killEvent(e);
       break;
   }
 };
 
 const consoleStart = () => {
-  window.video =
+  video =
     document.querySelector('video') ||
     [...document.querySelectorAll('iframe')].reduce((acc, el) => {
       try {
@@ -105,10 +98,9 @@ const consoleStart = () => {
       }
     }, false);
 
-  if (window.video === false)
-    console.error('Error: could not find video element.');
+  if (video === false) console.error('Error: could not find video element.');
 
-  window.playbackRateDiv = document.createElement('div');
+  playbackRateDiv = document.createElement('div');
   document.body.appendChild(playbackRateDiv);
   playbackRateDiv.style.color = '#fff';
   playbackRateDiv.style.textShadow =
@@ -127,7 +119,8 @@ const consoleStart = () => {
 };
 
 const consoleEnd = () => {
-  document.body.removeChild(window.playbackRateDiv);
+  video.playbackRate = 1;
+  document.body.removeChild(playbackRateDiv);
 
   window.removeEventListener('keydown', keyDownListener, true);
   window.removeEventListener('keyup', keyUpListener, true);
@@ -135,7 +128,7 @@ const consoleEnd = () => {
 
 var counter = 0;
 var running = false;
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keyup', (e) => {
   if (e.code == 'ControlRight' || e.code == 'ControlLeft') counter++;
   else counter = 0;
 
@@ -144,5 +137,9 @@ document.addEventListener('keydown', (e) => {
     else consoleEnd();
     running = !running;
     counter = 0;
+  } else {
+    setTimeout(() => {
+      counter = 0;
+    }, 1000);
   }
 });
