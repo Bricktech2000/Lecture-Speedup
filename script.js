@@ -5,10 +5,10 @@ const maxPow = 12; // multiplier ^ maxPow = 16 (max playback rate for most brows
 const mulPow = 6; // multiplier ^ mulPow = 4 (multiply playback rate by 4 when pressing right arrow key)
 const jumpTime = 5; // the number of seconds to jump backwards or forwards when the video is paused
 
-var video = null;
-var playbackRateDiv = null;
-var playbackInterval = null;
-var playbackRate = 1;
+let video = null;
+let playbackRateDiv = null;
+let playbackInterval = null;
+let playbackRate = 1;
 const updatePlaybackRate = (rateMultiplier) => {
   playbackRate = playbackRate * rateMultiplier;
 
@@ -126,8 +126,8 @@ const consoleEnd = () => {
   window.removeEventListener('keyup', keyUpListener, true);
 };
 
-var counter = 0;
-var running = false;
+let counter = 0;
+let running = false;
 document.addEventListener('keyup', (e) => {
   if (e.code == 'ControlRight' || e.code == 'ControlLeft') counter++;
   else counter = 0;
