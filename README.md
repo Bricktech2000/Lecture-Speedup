@@ -6,8 +6,8 @@ For the people who can't stand wasting valuable time
 
 Lecture Speedup is a simple browser extension I wrote to allow me to blaze through recorded lectures in university. It implements the following key bindings:
 
-- Right Shift: play / pause
-- Right Control: `playbackRate *= 4` while held
+- Right Shift: _play_ or _pause_
+- Right Control or Option: `playbackRate *= 4` while held
 - Up Arrow: `playbackRate *= cbrt(2)`
 - Down Arrow: `playbackRate /= cbrt(2)`
 - Left Arrow: `progress -= 5 seconds`
@@ -29,7 +29,7 @@ The extension also displays the current playback rate in the top left corner of 
 
 ## Usage
 
-To use the extension, navigate to a page containing an HTML `video` element and make sure the extension is enabled. Then, press the left Control key three times to activate the extension in the current page. Once activated, the current playback rate will be displayed in the top left corner of the page. Press the left Control key three times again to deactivate the extension.
+To use the extension, navigate to a page containing an HTML `video` element and make sure the extension is enabled. Then, press _Escape_ three times in quick succession to activate the extension in the current page. Once activated, the current playback rate will be displayed in the top left corner of the page. Press _Espace_ three times in quick succession again to deactivate the extension.
 
 ## Supported Services
 

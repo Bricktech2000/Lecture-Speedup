@@ -54,6 +54,7 @@ const keyDownListener = (e) => {
       killEvent(e);
       break;
     case 'ControlRight':
+    case 'AltRight':
       // https://stackoverflow.com/questions/32654074/how-to-make-a-video-jump-back-to-the-start-after-it-ends-using-javascript?noredirect=1&lq=1
       // https://stackoverflow.com/questions/6087959/prevent-javascript-keydown-event-from-being-handled-multiple-times-while-held-do
       if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, mulPow));
@@ -81,6 +82,7 @@ const keyDownListener = (e) => {
 const keyUpListener = (e) => {
   switch (e.code) {
     case 'ControlRight':
+    case 'AltRight':
       if (!e.repeat) updatePlaybackRate(Math.pow(multiplier, -mulPow));
       killEvent(e);
       break;
@@ -128,9 +130,11 @@ const consoleEnd = () => {
 
 let counter = 0;
 let running = false;
+let timeout = null;
 document.addEventListener('keyup', (e) => {
-  if (e.code == 'ControlRight' || e.code == 'ControlLeft') counter++;
+  if (e.key == 'Escape') counter++;
   else counter = 0;
+  clearTimeout(timeout);
 
   if (counter == 3) {
     if (!running) consoleStart();
@@ -138,7 +142,7 @@ document.addEventListener('keyup', (e) => {
     running = !running;
     counter = 0;
   } else {
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       counter = 0;
     }, 1000);
   }
