@@ -1,6 +1,6 @@
 # Lecture Speedup
 
-For the people who can't stand wasting valuable time
+_For the people who can't stand wasting valuable time_
 
 ## Overview
 
